@@ -1,8 +1,7 @@
 import { words } from './words.js';
 
 // Artık words dizisini kullanabilirsin
-let SECRET_WORD = words[Math.floor(Math.random() * words.length)];
-
+const SECRET_WORD = words[Math.floor(Math.random() * words.length)].toLocaleUpperCase('tr-TR');
 let attempts = 0;
 let currentGuess = "";
 const board = document.getElementById("game-board");
@@ -24,8 +23,10 @@ document.addEventListener("keydown", (e) => {
     } else if (e.key === "Backspace") {
         currentGuess = currentGuess.slice(0, -1);
         updateBoard();
-    } else if (currentGuess.length < 5 && /^[a-zA-Z]$/.test(e.key)) {
-        currentGuess += e.key.toUpperCase();
+    } else if (currentGuess.length < 5 && /^[a-zA-ZçğıöşüÇĞİÖŞÜİı]$/.test(e.key)) {
+        // İngilizce toUpperCase() "i"yi "I" yapar. 
+        // Türkçe için toLocaleUpperCase('tr-TR') kullanmalıyız.
+        currentGuess += e.key.toLocaleUpperCase('tr-TR');
         updateBoard();
     }
 });
