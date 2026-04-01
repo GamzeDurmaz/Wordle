@@ -39,24 +39,50 @@ function updateBoard() {
 }
 
 function checkGuess() {
+    const rowTiles = [];
     for (let i = 0; i < 5; i++) {
-        let tile = document.getElementById("tile-" + (attempts * 5 + i));
-        let letter = currentGuess[i];
-
-        if (letter === SECRET_WORD[i]) {
-            tile.classList.add("correct");
-        } else if (SECRET_WORD.includes(letter)) {
-            tile.classList.add("present");
-        } else {
-            tile.classList.add("absent");
-        }
+        rowTiles.push(document.getElementById("tile-" + (attempts * 5 + i)));
     }
 
+    const guessArray = currentGuess.split("");
+    const secretArray = SECRET_WORD.split("");
+    const statuses = Array(5).fill("absent"); // Varsayılan hepsi gri
+
+    // 1. AŞAMA: Önce Yeşilleri (Doğru yer) belirle
+    guessArray.forEach((letter, i) => {
+        if (letter === secretArray[i]) {
+            statuses[i] = "correct";
+            secretArray[i] = null; // Bu harfi kullandık, bir daha sarı yapma
+        }
+    });
+
+    // 2. AŞAMA: Sonra Sarı ve Grileri belirle
+    guessArray.forEach((letter, i) => {
+        if (statuses[i] !== "correct") { // Zaten yeşil değilse bak
+            const letterIndex = secretArray.indexOf(letter);
+            if (letterIndex !== -1) {
+                statuses[i] = "present"; // Kelimede var ama yeri yanlış
+                secretArray[letterIndex] = null; // Bu örneği de kullandık
+            } else {
+                statuses[i] = "absent"; // Kelimede yok veya tüm örnekleri tükendi
+            }
+        }
+    });
+
+    // Renkleri kutucuklara uygula
+    statuses.forEach((status, i) => {
+        rowTiles[i].classList.add(status);
+    });
+
+    // Oyun Sonu Kontrolü
     if (currentGuess === SECRET_WORD) {
         document.getElementById("message").innerText = "Tebrikler! 🎉";
+        attempts = 6; 
     } else {
         attempts++;
         currentGuess = "";
-        if (attempts === 6) document.getElementById("message").innerText = "Kaybettin! Kelime: " + SECRET_WORD;
+        if (attempts === 6) {
+            document.getElementById("message").innerText = "Kaybettin! Kelime: " + SECRET_WORD;
+        }
     }
 }
