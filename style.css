@@ -8,3 +8,32 @@ body { font-family: sans-serif; display: flex; flex-direction: column; align-ite
 .correct { background-color: #538d4e !important; border: none; }
 .present { background-color: #b59f3b !important; border: none; }
 .absent { background-color: #3a3a3c !important; border: none; }
+#keyboard {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 500px;
+}
+
+.key {
+    background-color: #818384;
+    color: white;
+    border: none;
+    padding: 15px 10px;
+    margin: 3px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    min-width: 35px;
+}
+
+.key.correct { background-color: #538d4e; }
+.key.present { background-color: #b59f3b; }
+.key.absent { background-color: #3a3a3c; }
+
+/* Enter ve Backspace tuşlarını biraz daha geniş yapalım */
+#key-ENTER, #key-BACK {
+    min-width: 65px;
+}

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,9 +48,20 @@
         }
 
         /* JS'teki classList.add ile tetiklenen renkler */
-        .correct { background-color: #538d4e; border-color: #538d4e; }
-        .present { background-color: #b59f3b; border-color: #b59f3b; }
-        .absent { background-color: #3a3a3c; border-color: #3a3a3c; }
+        .correct {
+            background-color: #538d4e;
+            border-color: #538d4e;
+        }
+
+        .present {
+            background-color: #b59f3b;
+            border-color: #b59f3b;
+        }
+
+        .absent {
+            background-color: #3a3a3c;
+            border-color: #3a3a3c;
+        }
 
         #message {
             margin-top: 30px;
@@ -60,15 +72,19 @@
         }
     </style>
 </head>
+
 <body>
 
     <h1>WORDLE</h1>
 
     <div id="game-board"></div>
 
+    <div id="keyboard" style="margin-top: 10px;"></div>
+
     <p id="message"></p>
 
-    <script src="wordle.js" type="module" ></script>
+    <script src="wordle.js" type="module"></script>
 
 </body>
+
 </html>
