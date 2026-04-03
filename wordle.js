@@ -1,14 +1,17 @@
 import { words } from './words.js';
+import { words_en } from './words-en.js';
 
-// 1. AYARLAR VE DEĞİŞKENLER
-const SECRET_WORD = words[Math.floor(Math.random() * words.length)].toLocaleUpperCase('tr-TR');
+const isEnglish = window.location.pathname.includes("wordle-en");
+
+const currentWords = isEnglish ? words_en : words;
+const SECRET_WORD = currentWords[Math.floor(Math.random() * currentWords.length)]
+    .toLocaleUpperCase(isEnglish ? 'en-US' : 'tr-TR');
+
 let attempts = 0;
 let currentGuess = "";
 const board = document.getElementById("game-board");
-const keyboard = document.getElementById("keyboard");
 const message = document.getElementById("message");
 
-// 2. OYUN TAHTASINI OLUŞTUR (6 Satır x 5 Sütun)
 for (let i = 0; i < 30; i++) {
     let tile = document.createElement("div");
     tile.classList.add("tile");
@@ -16,81 +19,38 @@ for (let i = 0; i < 30; i++) {
     board.appendChild(tile);
 }
 
-// 3. Q-KLAVYE DÜZENİ (3 Satır)
-const keys = [
-    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "Ğ", "Ü"],
-    ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ş", "İ"],
-    ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "Ö", "Ç", "BACK"]
-];
-
-function createKeyboard() {
-    keyboard.innerHTML = ""; // Mevcut içeriği temizle
-    keys.forEach(row => {
-        const rowDiv = document.createElement("div");
-        rowDiv.classList.add("keyboard-row");
-        
-        row.forEach(key => {
-            const button = document.createElement("button");
-            button.innerText = key;
-            button.setAttribute("id", "key-" + key);
-            button.classList.add("key");
-            
-            // Enter ve Back tuşlarını genişleten sınıf
-            if (key === "ENTER" || key === "BACK") {
-                button.classList.add("key-wide");
-            }
-
-            button.addEventListener("click", () => handleKeyPress(key));
-            rowDiv.appendChild(button);
-        });
-        keyboard.appendChild(rowDiv);
-    });
-}
-
-// 4. GİRİŞ YÖNETİMİ
-document.addEventListener("keydown", (e) => {
-    if (attempts >= 6) return;
-    let key = e.key.toLocaleUpperCase('tr-TR');
-    if (key === "BACKSPACE") key = "BACK";
-    handleKeyPress(key);
-});
-
-function handleKeyPress(key) {
-    if (attempts >= 6) return;
-
-    if (key === "ENTER") {
-        if (currentGuess.length === 5) checkGuess();
-    } else if (key === "BACK") {
-        currentGuess = currentGuess.slice(0, -1);
-        updateBoard();
-    } else if (currentGuess.length < 5 && key.length === 1 && /^[A-ZÇĞİÖŞÜ]$/.test(key)) {
-        currentGuess += key;
-        updateBoard();
-    }
-}
-
 function updateBoard() {
     for (let i = 0; i < 5; i++) {
         let tile = document.getElementById("tile-" + (attempts * 5 + i));
-        tile.innerText = currentGuess[i] || "";
+        if (tile) tile.innerText = currentGuess[i] || "";
     }
 }
 
-// 5. TAHMİN KONTROLÜ
 function checkGuess() {
-    const guessArray = currentGuess.split("");
+    if (currentGuess.length !== 5) return;
+
+    const isWordValid = isEnglish 
+        ? currentWords.includes(currentGuess) 
+        : currentWords.includes(currentGuess.toLocaleLowerCase('tr-TR'));
+
+    if (!isWordValid) {
+        message.innerText = isEnglish ? "Not in word list! ❌" : "Sözlükte yok! ❌";
+        shakeRow(attempts);
+        return; 
+    }
+
+    const guessToProcess = currentGuess;
+    const rowToProcess = attempts; 
+    const guessArray = guessToProcess.split("");
     const secretArray = SECRET_WORD.split("");
     const statuses = Array(5).fill("absent");
 
-    // Adım 1: Doğru yerdeki harfler (Yeşil)
     guessArray.forEach((letter, i) => {
         if (letter === secretArray[i]) {
             statuses[i] = "correct";
             secretArray[i] = null;
         }
     });
-
-    // Adım 2: Yanlış yerdeki harfler (Sarı)
     guessArray.forEach((letter, i) => {
         if (statuses[i] !== "correct") {
             const letterIndex = secretArray.indexOf(letter);
@@ -101,38 +61,117 @@ function checkGuess() {
         }
     });
 
-    // Adım 3: Görseli ve Klavyeyi Güncelle
+    attempts++; 
+    currentGuess = ""; 
+    message.innerText = "";
+
     statuses.forEach((status, i) => {
-        const tile = document.getElementById("tile-" + (attempts * 5 + i));
-        tile.classList.add(status);
-        updateKeyboardColors(guessArray[i], status);
+        const tile = document.getElementById("tile-" + (rowToProcess * 5 + i));
+        setTimeout(() => {
+            tile.classList.add("flip");
+            setTimeout(() => {
+                tile.classList.add(status);
+                updateKeyboardColors(guessArray[i], status);
+            }, 250); 
+        }, i * 150); 
     });
 
-    // Oyun Sonu
-    if (currentGuess === SECRET_WORD) {
-        message.innerText = "Tebrikler! 🎉";
-        attempts = 6;
-    } else {
-        attempts++;
-        currentGuess = "";
-        if (attempts === 6) message.innerText = "Kaybettin! Kelime: " + SECRET_WORD;
+    setTimeout(() => {
+        if (guessToProcess === SECRET_WORD) {
+            message.innerText = isEnglish ? "Impressive! 🎉" : "Tebrikler! 🎉";
+            attempts = 6; 
+        } else if (rowToProcess === 5) { 
+            message.innerText = (isEnglish ? "Game Over! Word: " : "Kaybettin! Kelime: ") + SECRET_WORD;
+        }
+    }, 1250); 
+}
+
+const trKeys = [
+    ["E", "R", "T", "Y", "U", "I", "O", "P", "Ğ", "Ü"],
+    ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ş", "İ", "ENTER"],
+    ["Z", "C", "V", "B", "N", "M", "Ö", "Ç", "BACK"]
+];
+
+const enKeys = [
+    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+    ["A", "S", "D", "F", "G", "H", "J", "K", "L", "ENTER"],
+    ["Z", "X", "C", "V", "B", "N", "M", "BACK"]
+];
+
+const keys = isEnglish ? enKeys : trKeys;
+
+function createKeyboard() {
+    const keyboard = document.getElementById("keyboard");
+    keyboard.innerHTML = ""; 
+
+    keys.forEach(row => {
+        const rowDiv = document.createElement("div");
+        rowDiv.classList.add("keyboard-row");
+        row.forEach(key => {
+            const button = document.createElement("button");
+            button.innerHTML = (key === "BACK") ? "&#x232B;" : key;
+            button.setAttribute("id", "key-" + key);
+            button.classList.add("key");
+            if (key === "ENTER" || key === "BACK") button.classList.add("key-wide");
+            button.addEventListener("click", () => handleKeyPress(key));
+            rowDiv.appendChild(button);
+        });
+        keyboard.appendChild(rowDiv);
+    });
+}
+
+document.addEventListener("keydown", (e) => {
+    if (attempts >= 6) return;
+    let key = e.key.toLocaleUpperCase(isEnglish ? 'en-US' : 'tr-TR');
+    if (key === "BACKSPACE") key = "BACK";
+    handleKeyPress(key);
+});
+
+function handleKeyPress(key) {
+    if (attempts >= 6) return;
+    if (key === "ENTER") {
+        if (currentGuess.length === 5) checkGuess();
+    } else if (key === "BACK") {
+        currentGuess = currentGuess.slice(0, -1);
+        updateBoard();
+    } else if (currentGuess.length < 5 && key.length === 1) {
+        const pattern = isEnglish ? /^[A-Z]$/ : /^[A-ZÇĞİÖŞÜ]$/;
+        if (pattern.test(key)) {
+            currentGuess += key;
+            updateBoard();
+        }
     }
 }
 
-// 6. KLAVYE RENK GÜNCELLEME (Hata almamak için fonksiyonu checkGuess dışına aldık)
 function updateKeyboardColors(letter, status) {
     const keyElement = document.getElementById("key-" + letter);
     if (!keyElement) return;
-
-    // Eğer tuş zaten yeşilse, rengini sarı veya griye çevirme
     if (keyElement.classList.contains("correct")) return;
-    
-    // Eğer tuş zaten sarıysa ve yeni durum griyse, sarı kalsın
     if (keyElement.classList.contains("present") && status === "absent") return;
 
     keyElement.classList.remove("present", "absent");
     keyElement.classList.add(status);
 }
 
-// Başlat
+function shakeRow(rowNumber) {
+    for (let i = 0; i < 5; i++) {
+        const tile = document.getElementById("tile-" + (rowNumber * 5 + i));
+        if (tile) {
+            tile.classList.add("shake");
+            setTimeout(() => tile.classList.remove("shake"), 500);
+        }
+    }
+}
+
+const langBtn = document.getElementById("lang-btn");
+if (langBtn) {
+    langBtn.addEventListener("click", () => {
+        if (isEnglish) {
+            window.location.href = "../index.html";
+        } else {
+            window.location.href = "wordle-en/index.html";
+        }
+    });
+}
+
 createKeyboard();

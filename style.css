@@ -8,32 +8,150 @@ body { font-family: sans-serif; display: flex; flex-direction: column; align-ite
 .correct { background-color: #538d4e !important; border: none; }
 .present { background-color: #b59f3b !important; border: none; }
 .absent { background-color: #3a3a3c !important; border: none; }
+
 #keyboard {
-    margin-top: 30px;
+    margin: 30px auto;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 550px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.keyboard-row {
+    display: flex;
     justify-content: center;
-    max-width: 500px;
+    gap: 6px;
+    width: 100%;
+    touch-action: manipulation;
 }
 
 .key {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    height: 58px;
+    background-color: #818384;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    transition: all 0.1s ease;
+    text-transform: uppercase;
+}
+
+.key.key-wide {
+    flex: 1.5;
+    font-size: 12px;
+}
+
+.key.correct {
+    background-color: #538d4e !important;
+}
+
+.key.present {
+    background-color: #b59f3b !important;
+}
+
+.key.absent {
+    background-color: #3a3a3c !important;
+}
+
+.key:hover {
+    background-color: #acafb0;
+}
+
+.key:active {
+    transform: scale(0.95);
+    opacity: 0.9;
+}
+
+@media (max-width: 480px) {
+    .key {
+        height: 50px;
+        font-size: 12px;
+        gap: 4px;
+    }
+    #keyboard {
+        gap: 5px;
+    }
+}
+
+.tile {
+    transition: none !important;
+    backface-visibility: hidden;
+}
+
+.flip {
+    animation: flip-animation 0.5s ease-in-out forwards;
+}
+
+@keyframes flip-animation {
+    0% {
+        transform: rotateX(0);
+    }
+    50% {
+        transform: rotateX(90deg);
+    }
+    100% {
+        transform: rotateX(0);
+    }
+}
+
+.tile.correct, .tile.present, .tile.absent {
+    transition: background-color 0s 0.25s, border-color 0s 0.25s;
+}
+
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translateX(-1px); }
+    20%, 80% { transform: translateX(2px); }
+    30%, 50%, 70% { transform: translateX(-4px); }
+    40%, 60% { transform: translateX(4px); }
+}
+
+#message {
+    height: 30px;
+    font-weight: bold;
+    color: #ff4d4d;
+    margin-bottom: 10px;
+}
+
+.header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.lang-button {
+    position: absolute;
+    right: 10px;
     background-color: #818384;
     color: white;
     border: none;
-    padding: 15px 10px;
-    margin: 3px;
+    padding: 5px 10px;
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
-    text-transform: uppercase;
-    min-width: 35px;
+    font-size: 14px;
+    transition: background-color 0.2s;
 }
 
-.key.correct { background-color: #538d4e; }
-.key.present { background-color: #b59f3b; }
-.key.absent { background-color: #3a3a3c; }
-
-/* Enter ve Backspace tuşlarını biraz daha geniş yapalım */
-#key-ENTER, #key-BACK {
-    min-width: 65px;
+.lang-button:hover {
+    background-color: #565758;
 }
