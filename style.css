@@ -1,23 +1,43 @@
 body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #121213; color: white; }
-#game-board { display: grid; grid-template-rows: repeat(6, 60px); grid-template-columns: repeat(5, 60px); gap: 5px; }
+#game-board { 
+    display: grid; 
+    grid-template-rows: repeat(6, 55px); /* 60px -> 55px yapıldı */
+    grid-template-columns: repeat(5, 55px); /* 60px -> 55px yapıldı */
+    gap: 6px; 
+    margin: 10px auto; /* Boşluklar dengelendi */
+}
+
 .tile { 
-    width: 60px; height: 60px; border: 2px solid #3a3a3c; 
-    display: flex; align-items: center; justify-content: center; 
-    font-size: 2rem; font-weight: bold; text-transform: uppercase; 
+    width: 55px; /* Boyut küçültüldü */
+    height: 55px; /* Boyut küçültüldü */
+    border: 2px solid #3a3a3c; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 1.8rem; /* Font biraz dengelendi */
+    font-weight: bold; 
+    text-transform: uppercase;
+    border-radius: 4px; /* Hafif köşe yuvarlatma eklendi */
+    box-sizing: border-box;
+}
+
+/* Harf girildiğinde kutunun parlaması (Pop efekti) */
+.tile:not(:empty) {
+    border-color: #565758;
 }
 .correct { background-color: #538d4e !important; border: none; }
 .present { background-color: #b59f3b !important; border: none; }
 .absent { background-color: #3a3a3c !important; border: none; }
 
 #keyboard {
-    margin: 30px auto;
+    margin: 20px auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    width: 100%;
-    max-width: 550px;
-    padding: 10px;
+    width: 95%; /* Genişlik kısıtlanarak kenar boşluğu sağlandı */
+    max-width: 500px; /* Maksimum genişlik daraltıldı */
+    padding: 0 15px; /* Yanlardan ekstra güvenli boşluk */
     box-sizing: border-box;
 }
 
@@ -26,26 +46,24 @@ body { font-family: sans-serif; display: flex; flex-direction: column; align-ite
     justify-content: center;
     gap: 6px;
     width: 100%;
-    touch-action: manipulation;
 }
 
 .key {
+    /* Mevcut key özelliklerin korunuyor */
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     font-weight: bold;
-    font-size: 14px;
-    height: 58px;
+    font-size: 13px; /* Font çok az küçültüldü */
+    height: 54px; /* Yükseklik çok az düşürüldü */
     background-color: #818384;
     color: #ffffff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    user-select: none;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 1;
     transition: all 0.1s ease;
-    text-transform: uppercase;
 }
 
 .key.key-wide {
@@ -154,4 +172,41 @@ body { font-family: sans-serif; display: flex; flex-direction: column; align-ite
 
 .lang-button:hover {
     background-color: #565758;
+}
+
+.modal {
+    position: fixed;
+    bottom: -100%; /* Başlangıçta ekranın dışında */
+    left: 0;
+    width: 100%;
+    height: auto;
+    background-color: #121213;
+    border-top: 2px solid #565758;
+    transition: bottom 0.5s ease-out;
+    z-index: 1000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal.show {
+    bottom: 0; /* Yukarı kayarak gelir */
+}
+
+.modal-content {
+    max-width: 500px;
+    margin: 0 auto;
+    color: white;
+    text-align: center;
+}
+
+#close-modal {
+    float: right;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+#modal-word {
+    color: #538d4e;
+    text-transform: uppercase;
+    margin-bottom: 10px;
 }

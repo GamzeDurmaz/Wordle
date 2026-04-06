@@ -34,7 +34,7 @@ function checkGuess() {
         : currentWords.includes(currentGuess.toLocaleLowerCase('tr-TR'));
 
     if (!isWordValid) {
-        message.innerText = isEnglish ? "Not in word list! ❌" : "Sözlükte yok! ❌";
+        message.innerText = isEnglish ? "Not in word list!" : "Sözlükte yok!";
         shakeRow(attempts);
         return; 
     }
@@ -76,14 +76,24 @@ function checkGuess() {
         }, i * 150); 
     });
 
-    setTimeout(() => {
-        if (guessToProcess === SECRET_WORD) {
-            message.innerText = isEnglish ? "Impressive! 🎉" : "Tebrikler! 🎉";
-            attempts = 6; 
-        } else if (rowToProcess === 5) { 
-            message.innerText = (isEnglish ? "Game Over! Word: " : "Kaybettin! Kelime: ") + SECRET_WORD;
+   setTimeout(() => {
+        const isWin = guessToProcess === SECRET_WORD;
+        const isLoss = rowToProcess === 5 && !isWin;
+
+        if (isWin || isLoss) {
+            // Mesajı güncelle
+            message.innerText = isWin 
+                ? (isEnglish ? "Impressive!" : "Tebrikler!") 
+                : (isEnglish ? "Game Over! Word: " : "Kaybettin! Kelime: ") + SECRET_WORD;
+            
+            attempts = 6; // Girişleri kilitle
+
+            // Kelime anlamını gösteren paneli 1 saniye gecikmeyle aç (Oyuncu sonucu idrak etsin)
+            setTimeout(() => {
+                showWordDefinition(SECRET_WORD);
+            }, 1000);
         }
-    }, 1250); 
+    }, 1000);
 }
 
 const trKeys = [
@@ -175,3 +185,40 @@ if (langBtn) {
 }
 
 createKeyboard();
+
+async function showWordDefinition(word) {
+    const modal = document.getElementById("word-info-modal");
+    const modalWord = document.getElementById("modal-word");
+    const modalMeaning = document.getElementById("modal-meaning");
+    
+    modalWord.innerText = word;
+    modal.classList.add("show");
+
+    if (isEnglish) {
+        try {
+            // Ücretsiz Free Dictionary API
+            const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
+            const data = await response.json();
+            
+            if (data[0] && data[0].meanings[0]) {
+                const definition = data[0].meanings[0].definitions[0].definition;
+                modalMeaning.innerText = definition;
+            }
+        } catch (error) {
+            modalMeaning.innerText = "Definition not found.";
+        }
+    } else {
+        // Türkçe için doğrudan API bulmak zor olduğu için yönlendirme butonu koyuyoruz
+        modalMeaning.innerText = "Kelimenin anlamını TDK üzerinden inceleyebilirsiniz.";
+        document.getElementById("modal-action").innerHTML = `
+            <a href="https://sozluk.gov.tr/?ara=${word.toLocaleLowerCase('tr-TR')}" 
+               target="_blank" class="key-wide" style="display:inline-block; padding:10px; text-decoration:none; background:#565758; color:white; border-radius:4px;">
+               TDK'da Gör
+            </a>`;
+    }
+}
+
+// Kapatma butonu için
+document.getElementById("close-modal").onclick = () => {
+    document.getElementById("word-info-modal").classList.remove("show");
+};

@@ -5,20 +5,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordle 1.0</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.1.7">
 </head>
 
 <body>
 
     <div class="header-container">
-    <h1>WORDLE TR</h1>
-    <button id="lang-btn" class="lang-button">EN</button>
-</div>
+        <h1>WORDLE TR</h1>
+        <button id="lang-btn" class="lang-button">EN</button>
+    </div>
     <div id="game-board"></div>
 
     <div id="keyboard" style="margin-top: 10px;"></div>
 
     <p id="message"></p>
+
+    <div id="word-info-modal" class="modal hidden">
+        <div class="modal-content">
+            <span id="close-modal">&times;</span>
+            <h2 id="modal-word"></h2>
+            <p id="modal-meaning">Anlamı yükleniyor...</p>
+            <div id="modal-action"></div>
+
+        </div>
+    </div>
 
     <script src="wordle.js" type="module"></script>
 
